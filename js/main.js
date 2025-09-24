@@ -21,22 +21,24 @@ document.addEventListener('DOMContentLoaded', () => {
   sceneEl.addEventListener("targetFound", () => {
     console.log("📍 targetFound EVENT");
 
-    // Aggiunge tutti i modelli in sequenza
     for (let i = modelsAdded; i < models.length; i++) {
+      const modelId = models[i]; // variabile locale per closure
+
       const modelEl = document.createElement('a-entity');
-      modelEl.setAttribute('gltf-model', models[i]);
-      modelEl.setAttribute('scale', { x:1, y:1, z:1 }); // scala uniforme 1 1 1
+      modelEl.setAttribute('gltf-model', modelId);
+      modelEl.setAttribute('scale', { x:1, y:1, z:1 }); // scala uniforme
       modelEl.setAttribute('position', { x:0, y:0.1, z:0 });
 
+      // Eventi di debug
       modelEl.addEventListener('model-loaded', () => {
-        console.log(`✅ Modello caricato correttamente: ${models[i]}`);
+        console.log(`✅ Modello caricato correttamente: ${modelId}`);
       });
       modelEl.addEventListener('model-error', (err) => {
-        console.error(`❌ Errore caricamento modello: ${models[i]}`, err);
+        console.error(`❌ Errore caricamento modello: ${modelId}`, err);
       });
 
       container.appendChild(modelEl);
-      console.log(`📦 Modello aggiunto al container: ${models[i]}`);
+      console.log(`📦 Modello aggiunto al container: ${modelId}`);
       modelsAdded++;
     }
   });
