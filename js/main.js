@@ -1,17 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
   console.log("🚀 main.js avviato");
 
-  const markerEl = document.getElementById('marker');
-  if (!markerEl) {
-    console.error("❌ marker non trovato nel DOM");
-    return;
-  }
-
-  markerEl.addEventListener('markerFound', () => {
-    console.log("📍 markerFound EVENT partito!");
+  const sceneEl = document.querySelector('a-scene');
+  sceneEl.addEventListener("arReady", () => {
+    console.log("✅ AR pronta");
   });
 
-  markerEl.addEventListener('markerLost', () => {
-    console.log("👋 markerLost EVENT partito!");
+  sceneEl.addEventListener("targetFound", (e) => {
+    console.log("📍 targetFound EVENT:", e);
+  });
+
+  sceneEl.addEventListener("targetLost", (e) => {
+    console.log("👋 targetLost EVENT:", e);
   });
 });
