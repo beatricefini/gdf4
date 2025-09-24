@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const models = [
     '#piece1','#piece2','#piece3','#piece4','#piece5','#piece6','#piece7'
   ];
-  let modelsAdded = 0;
+  let currentIndex = 0; // indica il prossimo modello da aggiungere
 
   sceneEl.addEventListener("arReady", () => {
     console.log("✅ AR pronta");
@@ -21,15 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
   sceneEl.addEventListener("targetFound", () => {
     console.log("📍 targetFound EVENT");
 
-    for (let i = modelsAdded; i < models.length; i++) {
-      const modelId = models[i]; // variabile locale per closure
+    // Aggiungiamo un solo modello per volta
+    if (currentIndex < models.length) {
+      const modelId = models[currentIndex];
 
       const modelEl = document.createElement('a-entity');
       modelEl.setAttribute('gltf-model', modelId);
-      modelEl.setAttribute('scale', { x:1, y:1, z:1 }); // scala uniforme
+      modelEl.setAttribute('scale', { x:1, y:1, z:1 });
       modelEl.setAttribute('position', { x:0, y:0.1, z:0 });
 
-      // Eventi di debug
       modelEl.addEventListener('model-loaded', () => {
         console.log(`✅ Modello caricato correttamente: ${modelId}`);
       });
@@ -39,7 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       container.appendChild(modelEl);
       console.log(`📦 Modello aggiunto al container: ${modelId}`);
-      modelsAdded++;
+
+      currentIndex++;
     }
   });
 
@@ -47,3 +48,4 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("👋 targetLost EVENT");
   });
 });
+
