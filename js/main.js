@@ -2,16 +2,19 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log("🚀 main.js avviato");
 
   const container = document.getElementById('modelsContainer');
-  if(!container) console.error("❌ modelsContainer non trovato nel DOM!");
+  if(!container) {
+    console.error("❌ modelsContainer non trovato!");
+    return;
+  }
 
   const models = [
-    'models/piece1.glb',
-    'models/piece2.glb',
-    'models/piece3.glb',
-    'models/piece4.glb',
-    'models/piece5.glb',
-    'models/piece6.glb',
-    'models/piece7.glb'
+    '#piece1',
+    '#piece2',
+    '#piece3',
+    '#piece4',
+    '#piece5',
+    '#piece6',
+    '#piece7'
   ];
 
   let currentIndex = 0;
@@ -32,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
   startText.setAttribute('value', 'Tap the screen\nto create your\nown little cinema');
   startText.setAttribute('align', 'center');
   startText.setAttribute('color', '#FFFFFF');
-  startText.setAttribute('position', { x:0, y:0.5, z:-1 }); // più vicino al pavimento
-  startText.setAttribute('scale', { x:4, y:4, z:4 });
+  startText.setAttribute('position', { x:0, y:0.5, z:0 }); // più vicino al pavimento
+  startText.setAttribute('scale', { x:3, y:3, z:3 });
   startText.setAttribute('width', '2');
   startText.setAttribute('font', 'mozillavr');
   container.appendChild(startText);
@@ -52,14 +55,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', models[currentIndex]);
     piece.setAttribute('scale', { x:1, y:1, z:1 });
-    piece.setAttribute('position', { x:0, y:-1, z:0 }); // più basso, pavimento
 
-    // Rotazione casuale iniziale
-    const rotX = (Math.random() - 0.5) * 20;
-    const rotY = (Math.random() - 0.5) * 20;
+    // Posizione sul pavimento, leggero offset casuale x/z
+    const offsetX = (Math.random()-0.5)*0.2;
+    const offsetZ = (Math.random()-0.5)*0.2;
+    piece.setAttribute('position', { x:offsetX, y:-1, z:offsetZ });
+
+    // Rotazione iniziale instabile
+    const rotX = (Math.random()-0.5)*20;
+    const rotY = (Math.random()-0.5)*20;
     piece.setAttribute('rotation', { x: rotX, y: rotY, z: 0 });
 
-    // Animazione pop-up verticale dal pavimento
+    // Animazione “pop-up” verticale con instabilità
     piece.setAttribute('animation__popup', {
       property: 'position',
       from: `0 -1 0`,
@@ -88,10 +95,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     container.appendChild(piece);
     console.log(`📦 Modello aggiunto: ${models[currentIndex]}`);
-
     currentIndex++;
 
-    // Video dopo ultimo pezzo
+    // Video su piece7 dopo 3 secondi dall’ultimo tap
     if(currentIndex === models.length){
       console.log("⏱ Tutti i pezzi aggiunti, avvio video in 3s...");
       setTimeout(() => {
@@ -100,29 +106,32 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error("❌ piece7 non trovato!");
           return;
         }
-        console.log("✅ piece7 trovato");
+        console.log("✅ piece7 trovato, aspetto che il modello sia caricato...");
 
-        const mesh = piece7El.getObject3D('mesh');
-        if(!mesh){
-          console.error("❌ Mesh di piece7 non trovata!");
-          return;
-        }
-        console.log("✅ Mesh di piece7 trovata, applico video");
+        piece7El.addEventListener('model-loaded', () => {
+          console.log("✅ piece7 modello caricato, applico video");
 
-        mesh.traverse(node => {
-          if(node.isMesh){
-            const videoTexture = new THREE.VideoTexture(video7);
-            videoTexture.flipY = false;
-            videoTexture.center.set(0.5,0.5);
-            videoTexture.repeat.x = -1;
-            node.material.map = videoTexture;
-            node.material.needsUpdate = true;
+          const mesh = piece7El.getObject3D('mesh');
+          if(!mesh){
+            console.error("❌ Mesh di piece7 non trovata!");
+            return;
           }
-        });
 
-        video7.play()
-          .then(() => console.log("✅ Video piece7 avviato"))
-          .catch(e => console.error("❌ Impossibile avviare il video:", e));
+          mesh.traverse(node => {
+            if(node.isMesh){
+              const videoTexture = new THREE.VideoTexture(video7);
+              videoTexture.flipY = false;
+              videoTexture.center.set(0.5,0.5);
+              videoTexture.repeat.x = -1;
+              node.material.map = videoTexture;
+              node.material.needsUpdate = true;
+            }
+          });
+
+          video7.play()
+            .then(() => console.log("✅ Video piece7 avviato"))
+            .catch(e => console.error("❌ Impossibile avviare il video:", e));
+        });
       }, 3000);
     }
   });
