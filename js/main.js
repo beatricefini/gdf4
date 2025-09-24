@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   startText.setAttribute('value', 'Tap the screen\nto create your\nown little cinema');
   startText.setAttribute('align', 'center');
   startText.setAttribute('color', '#FFFFFF');
-  startText.setAttribute('position', { x:0, y:0.5, z:0 }); // più vicino al pavimento
+  startText.setAttribute('position', { x:0, y:0.5, z:0 }); // vicino al pavimento
   startText.setAttribute('scale', { x:3, y:3, z:3 });
   startText.setAttribute('width', '2');
   startText.setAttribute('font', 'mozillavr');
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     piece.setAttribute('gltf-model', models[currentIndex]);
     piece.setAttribute('scale', { x:1, y:1, z:1 });
 
-    // Posizione sul pavimento, leggero offset casuale x/z
+    // Posizione sul pavimento con piccolo offset casuale
     const offsetX = (Math.random()-0.5)*0.2;
     const offsetZ = (Math.random()-0.5)*0.2;
     piece.setAttribute('position', { x:offsetX, y:-1, z:offsetZ });
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const rotY = (Math.random()-0.5)*20;
     piece.setAttribute('rotation', { x: rotX, y: rotY, z: 0 });
 
-    // Animazione “pop-up” verticale con instabilità
+    // Pop-up animazione verticale
     piece.setAttribute('animation__popup', {
       property: 'position',
       from: `0 -1 0`,
@@ -84,9 +84,34 @@ document.addEventListener('DOMContentLoaded', () => {
       delay: 300
     });
 
-    // Assegna id a piece7
+    // Se è piece7, assegna id e evento per il video PRIMA di append
     if(currentIndex === models.length - 1){
       piece.setAttribute('id','piece7');
+
+      piece.addEventListener('model-loaded', () => {
+        console.log("✅ piece7 modello caricato, applico video");
+
+        const mesh = piece.getObject3D('mesh');
+        if(!mesh){
+          console.error("❌ Mesh di piece7 non trovata!");
+          return;
+        }
+
+        mesh.traverse(node => {
+          if(node.isMesh){
+            const videoTexture = new THREE.VideoTexture(video7);
+            videoTexture.flipY = false;
+            videoTexture.center.set(0.5,0.5);
+            videoTexture.repeat.x = -1;
+            node.material.map = videoTexture;
+            node.material.needsUpdate = true;
+          }
+        });
+
+        video7.play()
+          .then(() => console.log("✅ Video piece7 avviato"))
+          .catch(e => console.error("❌ Impossibile avviare il video:", e));
+      });
     }
 
     piece.addEventListener('model-loaded', () => {
@@ -96,43 +121,5 @@ document.addEventListener('DOMContentLoaded', () => {
     container.appendChild(piece);
     console.log(`📦 Modello aggiunto: ${models[currentIndex]}`);
     currentIndex++;
-
-    // Video su piece7 dopo 3 secondi dall’ultimo tap
-    if(currentIndex === models.length){
-      console.log("⏱ Tutti i pezzi aggiunti, avvio video in 3s...");
-      setTimeout(() => {
-        const piece7El = document.getElementById('piece7');
-        if(!piece7El){
-          console.error("❌ piece7 non trovato!");
-          return;
-        }
-        console.log("✅ piece7 trovato, aspetto che il modello sia caricato...");
-
-        piece7El.addEventListener('model-loaded', () => {
-          console.log("✅ piece7 modello caricato, applico video");
-
-          const mesh = piece7El.getObject3D('mesh');
-          if(!mesh){
-            console.error("❌ Mesh di piece7 non trovata!");
-            return;
-          }
-
-          mesh.traverse(node => {
-            if(node.isMesh){
-              const videoTexture = new THREE.VideoTexture(video7);
-              videoTexture.flipY = false;
-              videoTexture.center.set(0.5,0.5);
-              videoTexture.repeat.x = -1;
-              node.material.map = videoTexture;
-              node.material.needsUpdate = true;
-            }
-          });
-
-          video7.play()
-            .then(() => console.log("✅ Video piece7 avviato"))
-            .catch(e => console.error("❌ Impossibile avviare il video:", e));
-        });
-      }, 3000);
-    }
   });
 });
