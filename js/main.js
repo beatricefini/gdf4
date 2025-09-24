@@ -14,41 +14,32 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
   let modelsAdded = false;
 
-  sceneEl.addEventListener("arReady", () => {
-    console.log("✅ AR pronta");
-  });
-
-  sceneEl.addEventListener("targetFound", async () => {
+  sceneEl.addEventListener("targetFound", () => {
     console.log("📍 targetFound EVENT");
 
-    if (modelsAdded) return;
+    if (modelsAdded) return; // aggiungiamo solo la prima volta
     modelsAdded = true;
 
-    for (let i = 0; i < models.length; i++) {
-      const modelId = models[i];
+    models.forEach((modelId, index) => {
+      setTimeout(() => {
+        const modelEl = document.createElement('a-entity');
+        modelEl.setAttribute('gltf-model', modelId);
+        modelEl.setAttribute('scale', { x:1, y:1, z:1 });
 
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          const modelEl = document.createElement('a-entity');
-          modelEl.setAttribute('gltf-model', modelId);
-          modelEl.setAttribute('scale', { x:1, y:1, z:1 });
-          modelEl.setAttribute('position', { x:0, y:0.1, z:0 });
+        // Spostiamo tutti i modelli “sul pavimento”
+        modelEl.setAttribute('position', { x:0, y:-0.5, z:0 });
 
-          modelEl.addEventListener('model-loaded', () => {
-            console.log(`✅ Modello caricato correttamente: ${modelId}`);
-            resolve();
-          });
+        modelEl.addEventListener('model-loaded', () => {
+          console.log(`✅ Modello caricato correttamente: ${modelId}`);
+        });
+        modelEl.addEventListener('model-error', (err) => {
+          console.error(`❌ Errore caricamento modello: ${modelId}`, err);
+        });
 
-          modelEl.addEventListener('model-error', (err) => {
-            console.error(`❌ Errore caricamento modello: ${modelId}`, err);
-            resolve(); // risolve comunque per non bloccare la sequenza
-          });
-
-          container.appendChild(modelEl);
-          console.log(`📦 Modello aggiunto al container: ${modelId}`);
-        }, i * 300); // delay 300ms tra modelli
-      });
-    }
+        container.appendChild(modelEl);
+        console.log(`📦 Modello aggiunto al container: ${modelId}`);
+      }, index * 200);
+    });
   });
 
   sceneEl.addEventListener("targetLost", () => {
