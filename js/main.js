@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         container.appendChild(modelEl);
         console.log(`📦 Modello aggiunto al container: ${modelId}`);
-      }, index * 800);
+      }, index * 200);
     });
   });
 
