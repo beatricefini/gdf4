@@ -4,40 +4,43 @@ document.addEventListener('DOMContentLoaded', () => {
   const sceneEl = document.querySelector('a-scene');
   const container = document.getElementById('modelsContainer');
 
-  // Test rapido: log se il container esiste
   if (!container) {
     console.error("❌ modelsContainer non trovato!");
     return;
   }
 
-  // Quando MindAR è pronto
+  const models = [
+    '#piece1','#piece2','#piece3','#piece4','#piece5','#piece6','#piece7'
+  ];
+  let modelsAdded = 0;
+
   sceneEl.addEventListener("arReady", () => {
     console.log("✅ AR pronta");
   });
 
-  // Quando il marker viene trovato
   sceneEl.addEventListener("targetFound", () => {
     console.log("📍 targetFound EVENT");
 
-    // Aggiungiamo il modello piece1
-    const modelEl = document.createElement('a-entity');
-    modelEl.setAttribute('gltf-model', '#piece1'); // usa id da <a-assets>
-    modelEl.setAttribute('scale', { x:0.2, y:0.2, z:0.2 }); // scala più piccola
-    modelEl.setAttribute('position', { x:0, y:0.1, z:0 }); // leggermente sopra il marker
+    // Aggiunge tutti i modelli in sequenza
+    for (let i = modelsAdded; i < models.length; i++) {
+      const modelEl = document.createElement('a-entity');
+      modelEl.setAttribute('gltf-model', models[i]);
+      modelEl.setAttribute('scale', { x:1, y:1, z:1 }); // scala uniforme 1 1 1
+      modelEl.setAttribute('position', { x:0, y:0.1, z:0 });
 
-    // Debug eventi modello
-    modelEl.addEventListener('model-loaded', () => {
-      console.log("✅ Modello piece1 caricato correttamente");
-    });
-    modelEl.addEventListener('model-error', (err) => {
-      console.error("❌ Errore caricamento modello piece1", err);
-    });
+      modelEl.addEventListener('model-loaded', () => {
+        console.log(`✅ Modello caricato correttamente: ${models[i]}`);
+      });
+      modelEl.addEventListener('model-error', (err) => {
+        console.error(`❌ Errore caricamento modello: ${models[i]}`, err);
+      });
 
-    container.appendChild(modelEl);
-    console.log("📦 Modello piece1 aggiunto al container");
+      container.appendChild(modelEl);
+      console.log(`📦 Modello aggiunto al container: ${models[i]}`);
+      modelsAdded++;
+    }
   });
 
-  // Quando il marker non è più visibile
   sceneEl.addEventListener("targetLost", () => {
     console.log("👋 targetLost EVENT");
   });
