@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   startText.setAttribute('value', 'Tap the screen\nto create your\nown little cinema');
   startText.setAttribute('align', 'center');
   startText.setAttribute('color', '#FFFFFF');
-  startText.setAttribute('position', { x:0, y:1.5, z:-1 });
+  startText.setAttribute('position', { x:0, y:0.5, z:-1 }); // più vicino al pavimento
   startText.setAttribute('scale', { x:4, y:4, z:4 });
   startText.setAttribute('width', '2');
   startText.setAttribute('font', 'mozillavr');
@@ -41,22 +41,20 @@ document.addEventListener('DOMContentLoaded', () => {
   let firstClick = true;
 
   window.addEventListener('click', () => {
-    // Prima volta: nasconde la scritta iniziale
     if(firstClick){
       if(startText) startText.setAttribute('visible','false');
       firstClick = false;
       return;
     }
 
-    // Tutti i pezzi sono già comparsi
     if(currentIndex >= models.length) return;
 
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', models[currentIndex]);
     piece.setAttribute('scale', { x:1, y:1, z:1 });
-    piece.setAttribute('position', { x:0, y:-0.5, z:0 }); // sul pavimento
+    piece.setAttribute('position', { x:0, y:-1, z:0 }); // più basso, pavimento
 
-    // Rotazione iniziale casuale
+    // Rotazione casuale iniziale
     const rotX = (Math.random() - 0.5) * 20;
     const rotY = (Math.random() - 0.5) * 20;
     piece.setAttribute('rotation', { x: rotX, y: rotY, z: 0 });
@@ -64,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Animazione pop-up verticale dal pavimento
     piece.setAttribute('animation__popup', {
       property: 'position',
-      from: `0 -0.5 0`,
+      from: `0 -1 0`,
       to: `0 0 0`,
       dur: 800,
       easing: 'easeOutElastic'
@@ -79,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
       delay: 300
     });
 
-    // Assegna id a piece7 per il video
+    // Assegna id a piece7
     if(currentIndex === models.length - 1){
       piece.setAttribute('id','piece7');
     }
@@ -93,26 +91,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     currentIndex++;
 
-    // Se è l'ultimo modello, avvia il video dopo 3 secondi
+    // Video dopo ultimo pezzo
     if(currentIndex === models.length){
+      console.log("⏱ Tutti i pezzi aggiunti, avvio video in 3s...");
       setTimeout(() => {
         const piece7El = document.getElementById('piece7');
-        if(piece7El){
-          const mesh = piece7El.getObject3D('mesh');
-          if(mesh){
-            mesh.traverse(node => {
-              if(node.isMesh){
-                const videoTexture = new THREE.VideoTexture(video7);
-                videoTexture.flipY = false;
-                videoTexture.center.set(0.5,0.5);
-                videoTexture.repeat.x = -1;
-                node.material.map = videoTexture;
-                node.material.needsUpdate = true;
-              }
-            });
-          }
-          video7.play().catch(e => console.warn("Impossibile avviare il video:", e));
+        if(!piece7El){
+          console.error("❌ piece7 non trovato!");
+          return;
         }
+        console.log("✅ piece7 trovato");
+
+        const mesh = piece7El.getObject3D('mesh');
+        if(!mesh){
+          console.error("❌ Mesh di piece7 non trovata!");
+          return;
+        }
+        console.log("✅ Mesh di piece7 trovata, applico video");
+
+        mesh.traverse(node => {
+          if(node.isMesh){
+            const videoTexture = new THREE.VideoTexture(video7);
+            videoTexture.flipY = false;
+            videoTexture.center.set(0.5,0.5);
+            videoTexture.repeat.x = -1;
+            node.material.map = videoTexture;
+            node.material.needsUpdate = true;
+          }
+        });
+
+        video7.play()
+          .then(() => console.log("✅ Video piece7 avviato"))
+          .catch(e => console.error("❌ Impossibile avviare il video:", e));
       }, 3000);
     }
   });
