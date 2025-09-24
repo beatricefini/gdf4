@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const models = [
     '#piece1','#piece2','#piece3','#piece4','#piece5','#piece6','#piece7'
   ];
-  let modelsAdded = 0;
+  let modelsAdded = false; // flag per aggiungere solo una volta
 
   sceneEl.addEventListener("arReady", () => {
     console.log("✅ AR pronta");
@@ -21,28 +21,32 @@ document.addEventListener('DOMContentLoaded', () => {
   sceneEl.addEventListener("targetFound", () => {
     console.log("📍 targetFound EVENT");
 
-    // Aggiunge tutti i modelli in sequenza
-    for (let i = modelsAdded; i < models.length; i++) {
-      const modelEl = document.createElement('a-entity');
-      modelEl.setAttribute('gltf-model', models[i]);
-      modelEl.setAttribute('scale', { x:1, y:1, z:1 }); // scala uniforme 1 1 1
-      modelEl.setAttribute('position', { x:0, y:0.1, z:0 });
+    if (modelsAdded) return; // aggiungiamo solo la prima volta
+    modelsAdded = true;
 
-      modelEl.addEventListener('model-loaded', () => {
-        console.log(`✅ Modello caricato correttamente: ${models[i]}`);
-      });
-      modelEl.addEventListener('model-error', (err) => {
-        console.error(`❌ Errore caricamento modello: ${models[i]}`, err);
-      });
+    // Aggiungi i modelli con delay crescente per stabilità
+    models.forEach((modelId, index) => {
+      setTimeout(() => {
+        const modelEl = document.createElement('a-entity');
+        modelEl.setAttribute('gltf-model', modelId);
+        modelEl.setAttribute('scale', { x:1, y:1, z:1 });
+        modelEl.setAttribute('position', { x:0, y:0.1, z:0 });
 
-      container.appendChild(modelEl);
-      console.log(`📦 Modello aggiunto al container: ${models[i]}`);
-      modelsAdded++;
-    }
+        // Eventi di debug
+        modelEl.addEventListener('model-loaded', () => {
+          console.log(`✅ Modello caricato correttamente: ${modelId}`);
+        });
+        modelEl.addEventListener('model-error', (err) => {
+          console.error(`❌ Errore caricamento modello: ${modelId}`, err);
+        });
+
+        container.appendChild(modelEl);
+        console.log(`📦 Modello aggiunto al container: ${modelId}`);
+      }, index * 200); // 200ms di differenza tra i modelli
+    });
   });
 
   sceneEl.addEventListener("targetLost", () => {
     console.log("👋 targetLost EVENT");
   });
 });
-
