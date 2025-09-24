@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   startText.setAttribute('value', 'Tap the screen\nto create your\nown little cinema');
   startText.setAttribute('align', 'center');
   startText.setAttribute('color', '#FFFFFF');
-  startText.setAttribute('position', { x:0, y:1.5, z:-1 }); // leggermente sopra il pavimento
+  startText.setAttribute('position', { x:0, y:1.5, z:-1 });
   startText.setAttribute('scale', { x:4, y:4, z:4 });
   startText.setAttribute('width', '2');
   startText.setAttribute('font', 'mozillavr');
@@ -41,20 +41,22 @@ document.addEventListener('DOMContentLoaded', () => {
   let firstClick = true;
 
   window.addEventListener('click', () => {
+    // Prima volta: nasconde la scritta iniziale
     if(firstClick){
       if(startText) startText.setAttribute('visible','false');
       firstClick = false;
       return;
     }
 
+    // Tutti i pezzi sono già comparsi
     if(currentIndex >= models.length) return;
 
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', models[currentIndex]);
     piece.setAttribute('scale', { x:1, y:1, z:1 });
-    piece.setAttribute('position', { x:0, y:-0.5, z:0 }); // pavimento
+    piece.setAttribute('position', { x:0, y:-0.5, z:0 }); // sul pavimento
 
-    // Rotazione casuale iniziale
+    // Rotazione iniziale casuale
     const rotX = (Math.random() - 0.5) * 20;
     const rotY = (Math.random() - 0.5) * 20;
     piece.setAttribute('rotation', { x: rotX, y: rotY, z: 0 });
@@ -77,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
       delay: 300
     });
 
-    // Assegna id a piece7
+    // Assegna id a piece7 per il video
     if(currentIndex === models.length - 1){
       piece.setAttribute('id','piece7');
     }
@@ -91,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     currentIndex++;
 
-    // Video alla fine
+    // Se è l'ultimo modello, avvia il video dopo 3 secondi
     if(currentIndex === models.length){
       setTimeout(() => {
         const piece7El = document.getElementById('piece7');
