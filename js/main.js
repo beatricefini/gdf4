@@ -89,31 +89,28 @@ document.addEventListener('DOMContentLoaded', () => {
       piece.setAttribute('id','piece7');
 
       piece.addEventListener('model-loaded', () => {
-        console.log("✅ piece7 modello caricato, avvio video tra 3 secondi...");
+        console.log("✅ piece7 modello caricato, applico video");
 
-        setTimeout(() => {
-          const mesh = piece.getObject3D('mesh');
-          if(!mesh){
-            console.error("❌ Mesh di piece7 non trovata!");
-            return;
+        const mesh = piece.getObject3D('mesh');
+        if(!mesh){
+          console.error("❌ Mesh di piece7 non trovata!");
+          return;
+        }
+
+        mesh.traverse(node => {
+          if(node.isMesh){
+            const videoTexture = new THREE.VideoTexture(video7);
+            videoTexture.flipY = false;
+            videoTexture.center.set(0.5,0.5);
+            videoTexture.repeat.x = -1;
+            node.material.map = videoTexture;
+            node.material.needsUpdate = true;
           }
+        });
 
-          mesh.traverse(node => {
-            if(node.isMesh){
-              const videoTexture = new THREE.VideoTexture(video7);
-              videoTexture.flipY = false;
-              videoTexture.center.set(0.5,0.5);
-              videoTexture.repeat.x = -1;
-              node.material.map = videoTexture;
-              node.material.needsUpdate = true;
-            }
-          });
-
-          video7.play()
-            .then(() => console.log("✅ Video piece7 avviato dopo 3s"))
-            .catch(e => console.error("❌ Impossibile avviare il video:", e));
-
-        }, 3000); // 3000 ms = 3 secondi
+        video7.play()
+          .then(() => console.log("✅ Video piece7 avviato"))
+          .catch(e => console.error("❌ Impossibile avviare il video:", e));
       });
     }
 
