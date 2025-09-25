@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentIndex = 0;
 
+  // Altezza base dei modelli (puoi cambiare questo valore)
+  const baseHeight = -0.5; // ad esempio -0.5 per pavimento, 0 per altezza normale
+
   // Video HTML per piece7
   const video7 = document.createElement('video');
   video7.setAttribute('id', 'video7');
@@ -35,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   startText.setAttribute('value', 'Tap the screen\nto create your\nown little cinema');
   startText.setAttribute('align', 'center');
   startText.setAttribute('color', '#FFFFFF');
-  startText.setAttribute('position', { x:0, y:0.5, z:0 }); // vicino al pavimento
+  startText.setAttribute('position', { x:0, y:baseHeight + 1, z:0 }); // leggermente sopra i modelli
   startText.setAttribute('scale', { x:3, y:3, z:3 });
   startText.setAttribute('width', '2');
   startText.setAttribute('font', 'mozillavr');
@@ -56,10 +59,10 @@ document.addEventListener('DOMContentLoaded', () => {
     piece.setAttribute('gltf-model', models[currentIndex]);
     piece.setAttribute('scale', { x:1, y:1, z:1 });
 
-    // Posizione sul pavimento con piccolo offset casuale
+    // Posizione sul pavimento con piccolo offset casuale e altezza configurabile
     const offsetX = (Math.random()-0.5)*0.2;
     const offsetZ = (Math.random()-0.5)*0.2;
-    piece.setAttribute('position', { x:offsetX, y:-1, z:offsetZ });
+    piece.setAttribute('position', { x:offsetX, y:baseHeight, z:offsetZ });
 
     // Rotazione iniziale instabile
     const rotX = (Math.random()-0.5)*20;
@@ -69,8 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pop-up animazione verticale
     piece.setAttribute('animation__popup', {
       property: 'position',
-      from: `0 -1 0`,
-      to: `0 0 0`,
+      from: `0 ${baseHeight - 1} 0`,
+      to: `0 ${baseHeight} 0`,
       dur: 800,
       easing: 'easeOutElastic'
     });
@@ -84,33 +87,35 @@ document.addEventListener('DOMContentLoaded', () => {
       delay: 300
     });
 
-    // Se è piece7, assegna id e evento per il video PRIMA di append
+    // Se è piece7, assegna id e evento per il video
     if(currentIndex === models.length - 1){
       piece.setAttribute('id','piece7');
 
       piece.addEventListener('model-loaded', () => {
-        console.log("✅ piece7 modello caricato, applico video");
+        console.log("✅ piece7 modello caricato, avvio video tra 3 secondi...");
 
-        const mesh = piece.getObject3D('mesh');
-        if(!mesh){
-          console.error("❌ Mesh di piece7 non trovata!");
-          return;
-        }
-
-        mesh.traverse(node => {
-          if(node.isMesh){
-            const videoTexture = new THREE.VideoTexture(video7);
-            videoTexture.flipY = false;
-            videoTexture.center.set(0.5,0.5);
-            videoTexture.repeat.x = -1;
-            node.material.map = videoTexture;
-            node.material.needsUpdate = true;
+        setTimeout(() => {
+          const mesh = piece.getObject3D('mesh');
+          if(!mesh){
+            console.error("❌ Mesh di piece7 non trovata!");
+            return;
           }
-        });
 
-        video7.play()
-          .then(() => console.log("✅ Video piece7 avviato"))
-          .catch(e => console.error("❌ Impossibile avviare il video:", e));
+          mesh.traverse(node => {
+            if(node.isMesh){
+              const videoTexture = new THREE.VideoTexture(video7);
+              videoTexture.flipY = false;
+              videoTexture.center.set(0.5,0.5);
+              videoTexture.repeat.x = -1;
+              node.material.map = videoTexture;
+              node.material.needsUpdate = true;
+            }
+          });
+
+          video7.play()
+            .then(() => console.log("✅ Video piece7 avviato dopo 3s"))
+            .catch(e => console.error("❌ Impossibile avviare il video:", e));
+        }, 3000);
       });
     }
 
