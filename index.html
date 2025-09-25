@@ -22,15 +22,20 @@
       <a-asset-item id="piece4" src="models/piece4.glb"></a-asset-item>
       <a-asset-item id="piece5" src="models/piece5.glb"></a-asset-item>
       <a-asset-item id="piece6" src="models/piece6.glb"></a-asset-item>
-      <a-asset-item id="piece7" src="models/piece7.glb"></a-asset-item>
     </a-assets>
 
+    <!-- Camera bloccata -->
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
+    <!-- Luci -->
     <a-entity light="type: ambient; color: #ffffff; intensity: 0.8"></a-entity>
     <a-entity light="type: directional; color: #ffffff; intensity: 0.6" position="0 1 1"></a-entity>
 
+    <!-- Target AR -->
     <a-entity mindar-image-target="targetIndex: 0" id="marker">
+      <!-- Contenitore testi -->
+      <a-entity id="introTexts"></a-entity>
+      <!-- Contenitore modelli -->
       <a-entity id="modelsContainer"></a-entity>
     </a-entity>
 
