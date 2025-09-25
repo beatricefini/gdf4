@@ -19,8 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentIndex = 0;
 
-  // Altezza base dei modelli (puoi cambiare questo valore)
-  const baseHeight = -0.5; // ad esempio -0.5 per pavimento, 0 per altezza normale
+  // --- CONFIGURAZIONI ---
+  const baseHeight = -0.5;    // Altezza dei modelli (es. pavimento)
+  const baseScale = 0.7;      // Scala base dei modelli
+  const scaleOffset = 0.1;    // Variazione casuale della scala +/-10%
+  const popupDuration = 800;  // Durata animazione pop-up
+  const stabilizeDuration = 600; // Durata animazione stabilizzazione rotazione
 
   // Video HTML per piece7
   const video7 = document.createElement('video');
@@ -38,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
   startText.setAttribute('value', 'Tap the screen\nto create your\nown little cinema');
   startText.setAttribute('align', 'center');
   startText.setAttribute('color', '#FFFFFF');
-  startText.setAttribute('position', { x:0, y:baseHeight + 1, z:0 }); // leggermente sopra i modelli
+  startText.setAttribute('position', { x:0, y:baseHeight + 1, z:0 }); 
   startText.setAttribute('scale', { x:3, y:3, z:3 });
   startText.setAttribute('width', '2');
   startText.setAttribute('font', 'mozillavr');
@@ -57,9 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', models[currentIndex]);
-    piece.setAttribute('scale', { x:1, y:1, z:1 });
 
-    // Posizione sul pavimento con piccolo offset casuale e altezza configurabile
+    // Scala casuale leggermente variata
+    const finalScale = baseScale + (Math.random()-0.5)*scaleOffset;
+    piece.setAttribute('scale', { x: finalScale, y: finalScale, z: finalScale });
+
+    // Posizione sul pavimento con piccolo offset casuale
     const offsetX = (Math.random()-0.5)*0.2;
     const offsetZ = (Math.random()-0.5)*0.2;
     piece.setAttribute('position', { x:offsetX, y:baseHeight, z:offsetZ });
@@ -74,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
       property: 'position',
       from: `0 ${baseHeight - 1} 0`,
       to: `0 ${baseHeight} 0`,
-      dur: 800,
+      dur: popupDuration,
       easing: 'easeOutElastic'
     });
 
@@ -82,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     piece.setAttribute('animation__stabilize', {
       property: 'rotation',
       to: '0 0 0',
-      dur: 600,
+      dur: stabilizeDuration,
       easing: 'easeOutQuad',
       delay: 300
     });
