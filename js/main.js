@@ -20,11 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentIndex = 0;
 
   // --- CONFIGURAZIONI ---
-  const baseHeight = -0.5;    // Altezza dei modelli (es. pavimento)
-  const baseScale = 0.7;      // Scala base dei modelli
-  const scaleOffset = 0.1;    // Variazione casuale della scala +/-10%
-  const popupDuration = 800;  // Durata animazione pop-up
-  const stabilizeDuration = 600; // Durata animazione stabilizzazione rotazione
+  const baseHeight = -0.5;    
+  const baseScale = 0.7;      
+  const scaleOffset = 0.1;    
+  const popupDuration = 800;  
+  const stabilizeDuration = 600; 
 
   // Video HTML per piece7
   const video7 = document.createElement('video');
@@ -50,21 +50,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let firstClick = true;
 
-  // Flag per gestione cubo finale
-  let allModelsAdded = false;
-  let finalCubeTimeout = null;
-
   // Funzione per creare il cubo finale
   function createFinalCube() {
     const finalCube = document.createElement('a-box');
-    finalCube.setAttribute('color', '#FF00FF'); // colore viola
+    finalCube.setAttribute('color', '#FF00FF'); 
     finalCube.setAttribute('depth', 0.5);
     finalCube.setAttribute('height', 0.5);
     finalCube.setAttribute('width', 0.5);
-    finalCube.setAttribute('position', '0 0 -0.5'); // davanti alla camera
+    finalCube.setAttribute('position', '0 0 -0.5'); 
     finalCube.setAttribute('scale', '0.5 0.5 0.5');
     container.appendChild(finalCube);
     console.log("🎉 Cubo finale apparso!");
+  }
+
+  // --- Animazione inversa veloce a cascata dei modelli e comparsa del cubo ---
+  function hideModelsAndShowCube() {
+    const children = Array.from(container.children).filter(c => c.tagName.toLowerCase() === 'a-entity');
+    const delayBetween = 100; 
+    const animDuration = 250; 
+
+    children.forEach((child, i) => {
+      // Animazione pop inverso: posizione
+      child.setAttribute('animation__popdown_pos', {
+        property: 'position',
+        to: `0 ${baseHeight - 1} 0`,
+        dur: animDuration,
+        easing: 'easeInQuad',
+        delay: i * delayBetween
+      });
+
+      // Animazione pop inverso: scala
+      child.setAttribute('animation__popdown_scale', {
+        property: 'scale',
+        to: '0 0 0',
+        dur: animDuration,
+        easing: 'easeInQuad',
+        delay: i * delayBetween
+      });
+
+      // Nascondi l'oggetto dopo l'animazione
+      setTimeout(() => {
+        child.setAttribute('visible', 'false');
+      }, animDuration + i * delayBetween);
+    });
+
+    // Mostra il cubo finale dopo l'ultima animazione
+    const totalDelay = animDuration + (children.length - 1) * delayBetween;
+    setTimeout(() => {
+      createFinalCube();
+    }, totalDelay + 50); 
   }
 
   window.addEventListener('click', () => {
@@ -140,21 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(() => console.log("✅ Video piece7 avviato dopo 3s"))
             .catch(e => console.error("❌ Impossibile avviare il video:", e));
 
-          // --- Gestione fine esperienza (dopo 4s video) ---
-          finalCubeTimeout = setTimeout(() => {
-            console.log("⏳ Tutti i modelli spariscono, cubo finale in arrivo...");
-
-            // Nascondi tutti i modelli e testi
-            const children = Array.from(container.children);
-            children.forEach(child => {
-              child.setAttribute('visible', 'false');
-            });
-
-            // Mostra il cubo finale
-            createFinalCube();
-          }, 4000);
-
-        }, 3000); // 3s prima di avviare il video
+          // Animazione finale: pop inverso e cubo
+          setTimeout(() => {
+            hideModelsAndShowCube();
+          }, 4000); // 4s dal video
+        }, 3000);
       });
     }
 
