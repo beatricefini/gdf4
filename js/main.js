@@ -50,6 +50,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let firstClick = true;
 
+  // Flag per gestione cubo finale
+  let allModelsAdded = false;
+  let finalCubeTimeout = null;
+
+  // Funzione per creare il cubo finale
+  function createFinalCube() {
+    const finalCube = document.createElement('a-box');
+    finalCube.setAttribute('color', '#FF00FF'); // colore viola
+    finalCube.setAttribute('depth', 0.5);
+    finalCube.setAttribute('height', 0.5);
+    finalCube.setAttribute('width', 0.5);
+    finalCube.setAttribute('position', '0 0 -0.5'); // davanti alla camera
+    finalCube.setAttribute('scale', '0.5 0.5 0.5');
+    container.appendChild(finalCube);
+    console.log("🎉 Cubo finale apparso!");
+  }
+
   window.addEventListener('click', () => {
     if(firstClick){
       if(startText) startText.setAttribute('visible','false');
@@ -122,7 +139,22 @@ document.addEventListener('DOMContentLoaded', () => {
           video7.play()
             .then(() => console.log("✅ Video piece7 avviato dopo 3s"))
             .catch(e => console.error("❌ Impossibile avviare il video:", e));
-        }, 3000);
+
+          // --- Gestione fine esperienza (dopo 4s video) ---
+          finalCubeTimeout = setTimeout(() => {
+            console.log("⏳ Tutti i modelli spariscono, cubo finale in arrivo...");
+
+            // Nascondi tutti i modelli e testi
+            const children = Array.from(container.children);
+            children.forEach(child => {
+              child.setAttribute('visible', 'false');
+            });
+
+            // Mostra il cubo finale
+            createFinalCube();
+          }, 4000);
+
+        }, 3000); // 3s prima di avviare il video
       });
     }
 
