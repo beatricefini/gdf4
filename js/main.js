@@ -63,23 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("🎉 Cubo finale apparso!");
   }
 
-  // --- Animazione inversa veloce a cascata dei modelli e comparsa del cubo ---
+  // --- Animazione inversa solo scala a cascata dei modelli e comparsa del cubo ---
   function hideModelsAndShowCube() {
     const children = Array.from(container.children).filter(c => c.tagName.toLowerCase() === 'a-entity');
-    const delayBetween = 100; 
-    const animDuration = 250; 
+    const delayBetween = 100; // ms tra l'inizio dell'animazione dei pezzi
+    const animDuration = 400; // durata leggermente più lenta
 
     children.forEach((child, i) => {
-      // Animazione pop inverso: posizione
-      child.setAttribute('animation__popdown_pos', {
-        property: 'position',
-        to: `0 ${baseHeight - 1} 0`,
-        dur: animDuration,
-        easing: 'easeInQuad',
-        delay: i * delayBetween
-      });
-
-      // Animazione pop inverso: scala
+      // Animazione pop inverso: solo scala
       child.setAttribute('animation__popdown_scale', {
         property: 'scale',
         to: '0 0 0',
@@ -98,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalDelay = animDuration + (children.length - 1) * delayBetween;
     setTimeout(() => {
       createFinalCube();
-    }, totalDelay + 50); 
+    }, totalDelay + 50);
   }
 
   window.addEventListener('click', () => {
@@ -174,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(() => console.log("✅ Video piece7 avviato dopo 3s"))
             .catch(e => console.error("❌ Impossibile avviare il video:", e));
 
-          // Animazione finale: pop inverso e cubo
+          // Animazione finale: solo scala a cascata e cubo
           setTimeout(() => {
             hideModelsAndShowCube();
           }, 4000); // 4s dal video
