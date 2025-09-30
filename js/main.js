@@ -122,7 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
           video7.play()
             .then(() => {
               console.log("✅ Video piece7 avviato dopo 3s");
-              // Dopo ~4s dall'inizio del video -> chiudi modelli e mostra finale
               setTimeout(() => {
                 hideModelsAndShowFinal();
               }, 4000);
@@ -144,8 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Animazione inversa solo scala a cascata dei modelli e comparsa finale ---
   function hideModelsAndShowFinal() {
     const children = Array.from(container.children).filter(c => c.tagName.toLowerCase() === 'a-entity');
-    const delayBetween = 100; // ms tra l'inizio dell'animazione dei pezzi
-    const animDuration = 400; // durata animazione scala
+    const delayBetween = 100;
+    const animDuration = 400;
 
     children.forEach((child, i) => {
       child.setAttribute('animation__popdown_scale', {
@@ -161,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }, animDuration + i * delayBetween);
     });
 
-    // Mostra il modello finale dopo l'ultima animazione
     const totalDelay = animDuration + (children.length - 1) * delayBetween;
     setTimeout(() => {
       createFinalModel();
@@ -173,15 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalModel = document.createElement('a-entity');
     finalModel.setAttribute('gltf-model', '#pieceCinema');
 
-    // Scala iniziale: X=2, Y=0, Z=2 (stringa!)
+    // Scala iniziale piatta (Y=0), X e Z fissi a 2
     finalModel.setAttribute('scale', '2 0 2');
     finalModel.setAttribute('position', { x: 0.25, y: baseHeight, z: 0 });
 
-    // Animazione solo asse Y (da 0 → 2) con interpolazione fluida
-    finalModel.setAttribute('animation__growY', {
-      property: 'scale.y',
-      from: 0,
-      to: 2,
+    // Animazione su tutta la scala (solo Y cambia)
+    finalModel.setAttribute('animation__grow', {
+      property: 'scale',
+      from: '2 0 2',
+      to: '2 2 2',
       dur: 1200,
       easing: 'easeOutElastic'
     });
