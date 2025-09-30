@@ -166,25 +166,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }, totalDelay + 50);
   }
 
-  // --- Mostra modello finale con pop ---
+  // --- Mostra modello finale con pop interpolato e testi ---
   function createFinalModel() {
     const finalModel = document.createElement('a-entity');
     finalModel.setAttribute('gltf-model', '#pieceCinema');
 
-    // Scala iniziale a zero
+    // Scala iniziale a zero per pop
     finalModel.setAttribute('scale', '0 0 0');
     finalModel.setAttribute('position', { x: 0.25, y: baseHeight, z: 0 });
 
-    // Animazione pop: scala da 0 0 0 → 2 2 2
+    // Animazione pop con interpolazione fluida
     finalModel.setAttribute('animation__pop', {
       property: 'scale',
       from: '0 0 0',
       to: '2 2 2',
-      dur: 800,
+      dur: 1200,
       easing: 'easeOutElastic'
     });
 
     container.appendChild(finalModel);
+
+    // --- Testo "1994" sopra il modello ---
+    const text1994 = document.createElement('a-text');
+    text1994.setAttribute('value', '1994');
+    text1994.setAttribute('align', 'center');
+    text1994.setAttribute('color', '#FFFFFF');
+    text1994.setAttribute('position', { x: 0.25, y: baseHeight + 2.5, z: 0 });
+    text1994.setAttribute('scale', '3 3 3');
+    container.appendChild(text1994);
+
+    // --- Testo "Renovation" sotto "1994" ---
+    const textRenovation = document.createElement('a-text');
+    textRenovation.setAttribute('value', 'Renovation');
+    textRenovation.setAttribute('align', 'center');
+    textRenovation.setAttribute('color', '#FFFFFF');
+    textRenovation.setAttribute('position', { x: 0.25, y: baseHeight + 2.0, z: 0 });
+    textRenovation.setAttribute('scale', '1.5 1.5 1.5');
+    container.appendChild(textRenovation);
   }
 });
 
