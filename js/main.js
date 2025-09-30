@@ -20,10 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentIndex = 0;
 
   // --- CONFIGURAZIONI ---
-  const baseHeight = -0.5;    // Altezza dei modelli (es. pavimento)
-  const baseScale = 0.7;      // Scala base dei modelli
-  const scaleOffset = 0.1;    // Variazione casuale della scala +/-10%
-  const popupDuration = 800;  // Durata animazione pop-up
+  const baseHeight = -0.5;       // Altezza dei modelli (es. pavimento)
+  const baseScale = 0.7;         // Scala base dei modelli
+  const scaleOffset = 0.1;       // Variazione casuale della scala +/-10%
+  const popupDuration = 800;     // Durata animazione pop-up
   const stabilizeDuration = 600; // Durata animazione stabilizzazione rotazione
 
   // Video HTML per piece7
@@ -168,22 +168,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }, totalDelay + 50);
   }
 
-  // --- Mostra modello finale ---
+  // --- Mostra modello finale (piece_cinema4.glb) ---
   function createFinalModel() {
     const finalModel = document.createElement('a-entity');
     finalModel.setAttribute('gltf-model', '#pieceCinema');
-    finalModel.setAttribute('scale', '1 1 1');
+
+    // Scala più grande della normale
+    finalModel.setAttribute('scale', '1.3 1.3 1.3');
     finalModel.setAttribute('position', { x: 0, y: baseHeight, z: 0 });
 
-    // Effetto comparsa pop-up
-    finalModel.setAttribute('animation__popup', {
+    // Crescita dal basso (Y da 0 -> 1.3)
+    finalModel.setAttribute('animation__grow', {
       property: 'scale',
-      from: '0 0 0',
-      to: '1 1 1',
-      dur: 600,
+      from: '1.3 0 1.3',
+      to: '1.3 1.3 1.3',
+      dur: 1000,
       easing: 'easeOutElastic'
     });
 
     container.appendChild(finalModel);
   }
 });
+
