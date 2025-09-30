@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
   startText.setAttribute('align', 'center');
   startText.setAttribute('color', '#FFFFFF');
   startText.setAttribute('position', { x: 0, y: baseHeight + 1, z: 0 });
-  startText.setAttribute('scale', { x: 3, y: 3, z: 3 });
+  startText.setAttribute('scale', { x: 1.5, y: 1.5, z: 1.5 }); // ridotto
   startText.setAttribute('width', '2');
   startText.setAttribute('font', 'mozillavr');
   container.appendChild(startText);
@@ -191,8 +191,8 @@ document.addEventListener('DOMContentLoaded', () => {
     text1994.setAttribute('value', '1994');
     text1994.setAttribute('align', 'center');
     text1994.setAttribute('color', '#FFFFFF');
-    text1994.setAttribute('position', { x: 0.25, y: baseHeight + 2.5, z: 0 });
-    text1994.setAttribute('scale', '3 3 3');
+    text1994.setAttribute('position', { x: 0.25, y: baseHeight + 1.5, z: 0 });
+    text1994.setAttribute('scale', '1.5 1.5 1.5'); // ridotto
     container.appendChild(text1994);
 
     // --- Testo "Renovation" sotto "1994" ---
@@ -200,8 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
     textRenovation.setAttribute('value', 'Renovation');
     textRenovation.setAttribute('align', 'center');
     textRenovation.setAttribute('color', '#FFFFFF');
-    textRenovation.setAttribute('position', { x: 0.25, y: baseHeight + 2.0, z: 0 });
-    textRenovation.setAttribute('scale', '1.5 1.5 1.5');
+    textRenovation.setAttribute('position', { x: 0.25, y: baseHeight + 1.2, z: 0 });
+    textRenovation.setAttribute('scale', '1 1 1'); // ridotto
     container.appendChild(textRenovation);
   }
 });
