@@ -173,8 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalModel = document.createElement('a-entity');
     finalModel.setAttribute('gltf-model', '#pieceCinema');
 
-    // Scala iniziale: X e Z fissi, Y a 0
-    finalModel.setAttribute('scale', { x: 2, y: 0, z: 2 });
+    // Scala iniziale: X=2, Y=0, Z=2 (stringa!)
+    finalModel.setAttribute('scale', '2 0 2');
     finalModel.setAttribute('position', { x: 0.25, y: baseHeight, z: 0 });
 
     // Animazione solo asse Y (da 0 → 2) con interpolazione fluida
