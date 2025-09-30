@@ -20,11 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentIndex = 0;
 
   // --- CONFIGURAZIONI ---
-  const baseHeight = -0.5;       // Altezza dei modelli (es. pavimento)
-  const baseScale = 0.7;         // Scala base dei modelli
-  const scaleOffset = 0.1;       // Variazione casuale della scala +/-10%
-  const popupDuration = 800;     // Durata animazione pop-up
-  const stabilizeDuration = 600; // Durata animazione stabilizzazione rotazione
+  const baseHeight = -0.5;        // Altezza dei modelli (es. pavimento)
+  const baseScale = 0.7;          // Scala base dei modelli
+  const scaleOffset = 0.1;        // Variazione casuale scala
+  const popupDuration = 800;      // Durata animazione pop-up
+  const stabilizeDuration = 600;  // Durata stabilizzazione rotazione
+  const reversePopDuration = 400; // Durata pop inverso
 
   // Video HTML per piece7
   const video7 = document.createElement('video');
@@ -43,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   startText.setAttribute('align', 'center');
   startText.setAttribute('color', '#FFFFFF');
   startText.setAttribute('position', { x: 0, y: baseHeight + 0.8, z: 0 });
-  startText.setAttribute('scale', { x: 1, y: 1, z: 1 }); // più piccolo
+  startText.setAttribute('scale', { x: 1.2, y: 1.2, z: 1.2 });
   startText.setAttribute('width', '2');
   startText.setAttribute('font', 'mozillavr');
   container.appendChild(startText);
@@ -120,13 +121,13 @@ document.addEventListener('DOMContentLoaded', () => {
           });
 
           video7.play()
-            .then(() => {
-              console.log("✅ Video piece7 avviato dopo 3s");
-              setTimeout(() => {
-                hideModelsAndShowFinal();
-              }, 4000);
-            })
+            .then(() => console.log("✅ Video piece7 avviato dopo 3s"))
             .catch(e => console.error("❌ Impossibile avviare il video:", e));
+
+          // Dopo 4 secondi dall'inizio del video → animazione finale
+          setTimeout(() => {
+            removeAllPiecesAndShowFinal();
+          }, 4000);
         }, 3000);
       });
     }
@@ -140,42 +141,37 @@ document.addEventListener('DOMContentLoaded', () => {
     currentIndex++;
   });
 
-  // --- Animazione inversa solo scala a cascata dei modelli e comparsa finale ---
-  function hideModelsAndShowFinal() {
-    const children = Array.from(container.children).filter(c => c.tagName.toLowerCase() === 'a-entity');
-    const delayBetween = 100;
-    const animDuration = 400;
+  // --- Funzione per rimuovere i modelli con pop inverso e mostrare il finale ---
+  function removeAllPiecesAndShowFinal() {
+    const pieces = Array.from(container.querySelectorAll('a-entity[gltf-model]'));
 
-    children.forEach((child, i) => {
-      child.setAttribute('animation__popdown_scale', {
+    pieces.forEach((piece, i) => {
+      piece.setAttribute('animation__shrink', {
         property: 'scale',
         to: '0 0 0',
-        dur: animDuration,
-        easing: 'easeInQuad',
-        delay: i * delayBetween
+        dur: reversePopDuration,
+        easing: 'easeInBack',
+        delay: i * 150
       });
 
       setTimeout(() => {
-        child.setAttribute('visible', 'false');
-      }, animDuration + i * delayBetween);
+        piece.parentNode.removeChild(piece);
+      }, reversePopDuration + i * 150 + 50);
     });
 
-    const totalDelay = animDuration + (children.length - 1) * delayBetween;
+    const totalDelay = pieces.length * 150 + reversePopDuration + 200;
     setTimeout(() => {
       createFinalModel();
-    }, totalDelay + 50);
+    }, totalDelay);
   }
 
-  // --- Mostra modello finale con pop interpolato e testi ---
+  // --- Mostra modello finale con pop e testi centrati ---
   function createFinalModel() {
     const finalModel = document.createElement('a-entity');
     finalModel.setAttribute('gltf-model', '#pieceCinema');
-
-    // Scala iniziale a zero per pop
     finalModel.setAttribute('scale', '0 0 0');
     finalModel.setAttribute('position', { x: 0.25, y: baseHeight, z: 0 });
 
-    // Animazione pop con interpolazione fluida
     finalModel.setAttribute('animation__pop', {
       property: 'scale',
       from: '0 0 0',
@@ -186,22 +182,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     container.appendChild(finalModel);
 
-    // --- Testo "1994" sopra il modello ---
+    // --- Testo "1994" centrato su X ---
     const text1994 = document.createElement('a-text');
     text1994.setAttribute('value', '1994');
     text1994.setAttribute('align', 'center');
+    text1994.setAttribute('anchor', 'center');
     text1994.setAttribute('color', '#FFFFFF');
-    text1994.setAttribute('position', { x: 0.25, y: baseHeight + 0.8, z: 0 });
-    text1994.setAttribute('scale', '0.8 0.8 0.8'); // più piccolo
+    text1994.setAttribute('position', { x: 0, y: baseHeight + 0.7, z: 0 });
+    text1994.setAttribute('scale', '0.5 0.5 0.5');
+    text1994.setAttribute('opacity', '0');
+    text1994.setAttribute('animation__fadein', {
+      property: 'opacity',
+      from: 0,
+      to: 1,
+      dur: 800,
+      easing: 'easeInQuad',
+      delay: 200
+    });
     container.appendChild(text1994);
 
-    // --- Testo "Renovation" sotto "1994" ---
+    // --- Testo "Renovation" centrato su X ---
     const textRenovation = document.createElement('a-text');
     textRenovation.setAttribute('value', 'Renovation');
     textRenovation.setAttribute('align', 'center');
+    textRenovation.setAttribute('anchor', 'center');
     textRenovation.setAttribute('color', '#FFFFFF');
-    textRenovation.setAttribute('position', { x: 0.25, y: baseHeight + 0.6, z: 0 });
-    textRenovation.setAttribute('scale', '0.5 0.5 0.5'); // più piccolo
+    textRenovation.setAttribute('position', { x: 0, y: baseHeight + 0.55, z: 0 });
+    textRenovation.setAttribute('scale', '0.35 0.35 0.35');
+    textRenovation.setAttribute('opacity', '0');
+    textRenovation.setAttribute('animation__fadein', {
+      property: 'opacity',
+      from: 0,
+      to: 1,
+      dur: 800,
+      easing: 'easeInQuad',
+      delay: 1200
+    });
     container.appendChild(textRenovation);
   }
 });
