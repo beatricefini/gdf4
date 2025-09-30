@@ -173,15 +173,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalModel = document.createElement('a-entity');
     finalModel.setAttribute('gltf-model', '#pieceCinema');
 
-    // Scala finale più grande (2x) e spostato leggermente a destra
-    finalModel.setAttribute('scale', '2 2 2');
-    finalModel.setAttribute('position', { x: 0.5, y: baseHeight, z: 0 });
+    // Scala iniziale: X e Z fissi, Y a 0
+    finalModel.setAttribute('scale', { x: 2, y: 0, z: 2 });
+    finalModel.setAttribute('position', { x: 0.25, y: baseHeight, z: 0 });
 
-    // Crescita dal basso (Y da 0 -> 2), con interpolazione fluida
-    finalModel.setAttribute('animation__grow', {
-      property: 'scale',
-      from: '2 0 2',
-      to: '2 2 2',
+    // Animazione solo asse Y (da 0 → 2) con interpolazione fluida
+    finalModel.setAttribute('animation__growY', {
+      property: 'scale.y',
+      from: 0,
+      to: 2,
       dur: 1200,
       easing: 'easeOutElastic'
     });
