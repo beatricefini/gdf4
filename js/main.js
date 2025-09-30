@@ -42,11 +42,11 @@ document.addEventListener('DOMContentLoaded', () => {
   startText.setAttribute('id', 'startText');
   startText.setAttribute('value', 'Tap the screen\nto create your\nown little cinema');
   startText.setAttribute('align', 'center');
-  startText.setAttribute('color', '#FFFFFF');
+  startText.setAttribute('color', '#000000'); // nero
+  startText.setAttribute('font', 'roboto');
   startText.setAttribute('position', { x: 0, y: baseHeight + 0.8, z: 0 });
-  startText.setAttribute('scale', { x: 1.2, y: 1.2, z: 1.2 });
+  startText.setAttribute('scale', { x: 1, y: 1, z: 1 });
   startText.setAttribute('width', '2');
-  startText.setAttribute('font', 'mozillavr');
   container.appendChild(startText);
 
   let firstClick = true;
@@ -182,15 +182,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     container.appendChild(finalModel);
 
-    // --- Testo "1994" centrato su X ---
+    // --- Testo "1994" (bold simulato con scala + thickness) ---
     const text1994 = document.createElement('a-text');
     text1994.setAttribute('value', '1994');
     text1994.setAttribute('align', 'center');
     text1994.setAttribute('anchor', 'center');
-    text1994.setAttribute('color', '#FFFFFF');
+    text1994.setAttribute('color', '#000000'); // nero
+    text1994.setAttribute('font', 'roboto');
     text1994.setAttribute('position', { x: 0, y: baseHeight + 0.7, z: 0 });
-    text1994.setAttribute('scale', '0.5 0.5 0.5');
+    text1994.setAttribute('scale', '0.7 0.7 0.7'); // più grande
     text1994.setAttribute('opacity', '0');
+    text1994.setAttribute('shader', 'msdf'); // migliora resa font
+    text1994.setAttribute('negate', 'false');
     text1994.setAttribute('animation__fadein', {
       property: 'opacity',
       from: 0,
@@ -201,15 +204,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     container.appendChild(text1994);
 
-    // --- Testo "Renovation" centrato su X ---
+    // --- Testo "Renovation" ---
     const textRenovation = document.createElement('a-text');
     textRenovation.setAttribute('value', 'Renovation');
     textRenovation.setAttribute('align', 'center');
     textRenovation.setAttribute('anchor', 'center');
-    textRenovation.setAttribute('color', '#FFFFFF');
+    textRenovation.setAttribute('color', '#000000'); // nero
+    textRenovation.setAttribute('font', 'roboto');
     textRenovation.setAttribute('position', { x: 0, y: baseHeight + 0.55, z: 0 });
-    textRenovation.setAttribute('scale', '0.35 0.35 0.35');
+    textRenovation.setAttribute('scale', '0.4 0.4 0.4');
     textRenovation.setAttribute('opacity', '0');
+    textRenovation.setAttribute('shader', 'msdf');
+    textRenovation.setAttribute('negate', 'false');
     textRenovation.setAttribute('animation__fadein', {
       property: 'opacity',
       from: 0,
