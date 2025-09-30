@@ -166,21 +166,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }, totalDelay + 50);
   }
 
-  // --- Mostra modello finale (piece_cinema4.glb) ---
+  // --- Mostra modello finale con pop ---
   function createFinalModel() {
     const finalModel = document.createElement('a-entity');
     finalModel.setAttribute('gltf-model', '#pieceCinema');
 
-    // Scala iniziale piatta (Y=0), X e Z fissi a 2
-    finalModel.setAttribute('scale', '2 0 2');
+    // Scala iniziale a zero
+    finalModel.setAttribute('scale', '0 0 0');
     finalModel.setAttribute('position', { x: 0.25, y: baseHeight, z: 0 });
 
-    // Animazione su tutta la scala (solo Y cambia)
-    finalModel.setAttribute('animation__grow', {
+    // Animazione pop: scala da 0 0 0 → 2 2 2
+    finalModel.setAttribute('animation__pop', {
       property: 'scale',
-      from: '2 0 2',
+      from: '0 0 0',
       to: '2 2 2',
-      dur: 1200,
+      dur: 800,
       easing: 'easeOutElastic'
     });
 
