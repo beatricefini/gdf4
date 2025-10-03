@@ -12,9 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Stato globale sequenza ---
   const models = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6','#piece7'];
-  let currentIndex = 0;
-  let sequenceStarted = false;
-  let firstClick = true;
+  let currentIndex = 0; // tiene traccia del pezzo corrente
+  let sequenceStarted = false; // per avviare initModelsSequence solo una volta
+  let firstClick = true; // per gestire il primo tap con la scritta iniziale
+  let markerVisible = false; // per sapere se il marker è attualmente visibile
 
   // Video piece7
   const video7 = document.createElement('video');
@@ -26,17 +27,39 @@ document.addEventListener("DOMContentLoaded", () => {
   video7.webkitPlaysInline = true;
   document.body.appendChild(video7);
 
-  // Testo iniziale
   const baseHeight = -0.5;
-  const startText = document.createElement('a-text');
-  startText.setAttribute('value', 'Tap the screen\nto create your\nown little cinema');
-  startText.setAttribute('align', 'center');
-  startText.setAttribute('color', '#000000');
-  startText.setAttribute('font', 'roboto');
-  startText.setAttribute('position', { x:0, y:baseHeight+0.8, z:0 });
-  startText.setAttribute('scale', { x:1, y:1, z:1 });
-  startText.setAttribute('width','2');
-  container.appendChild(startText);
+  const baseScale = 0.7;
+  const scaleOffset = 0.1;
+  const popupDuration = 800;
+  const stabilizeDuration = 600;
+  const reversePopDuration = 400;
+
+  // --- Funzione per creare la sequenza ---
+  function initModelsSequence() {
+    // Testo iniziale "Tap the screen..."
+    const startText = document.createElement('a-text');
+    startText.setAttribute('value', 'Tap the screen\nto create your\nown little cinema');
+    startText.setAttribute('align', 'center');
+    startText.setAttribute('color', '#000000');
+    startText.setAttribute('font', 'roboto');
+    startText.setAttribute('position', { x:0, y:baseHeight+0.8, z:0 });
+    startText.setAttribute('scale', { x:1, y:1, z:1 });
+    startText.setAttribute('width','2');
+    container.appendChild(startText);
+
+    // --- Gestione click globale ---
+    window.addEventListener('click', () => {
+      if(!markerVisible) return; // ignora click se il marker non è visibile
+
+      if(firstClick){
+        startText.setAttribute('visible','false');
+        firstClick=false;
+        addNextPiece(); // primo pezzo
+        return;
+      }
+      addNextPiece();
+    });
+  }
 
   // --- Funzione per aggiungere il prossimo modello ---
   function addNextPiece() {
@@ -45,36 +68,38 @@ document.addEventListener("DOMContentLoaded", () => {
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', models[currentIndex]);
 
-    const baseScale = 0.7;
-    const scaleOffset = 0.1;
+    // Scala casuale
     const finalScale = baseScale + (Math.random()-0.5)*scaleOffset;
     piece.setAttribute('scale', { x: finalScale, y: finalScale, z: finalScale });
 
+    // Posizione pavimento + offset casuale
     const offsetX = (Math.random()-0.5)*0.2;
     const offsetZ = (Math.random()-0.5)*0.2;
     piece.setAttribute('position', { x: offsetX, y: baseHeight, z: offsetZ });
 
+    // Rotazione iniziale instabile
     const rotX = (Math.random()-0.5)*20;
     const rotY = (Math.random()-0.5)*20;
     piece.setAttribute('rotation', { x: rotX, y: rotY, z: 0 });
 
+    // Animazioni pop-up e stabilizzazione
     piece.setAttribute('animation__popup', {
       property: 'position',
       from: `0 ${baseHeight-1} 0`,
       to: `0 ${baseHeight} 0`,
-      dur: 800,
+      dur: popupDuration,
       easing: 'easeOutElastic'
     });
 
     piece.setAttribute('animation__stabilize', {
       property: 'rotation',
       to: '0 0 0',
-      dur: 600,
+      dur: stabilizeDuration,
       easing: 'easeOutQuad',
       delay: 300
     });
 
-    // Video piece7
+    // Gestione video piece7
     if(currentIndex === models.length-1){
       piece.id = "piece7";
       piece.addEventListener('model-loaded', () => {
@@ -109,13 +134,13 @@ document.addEventListener("DOMContentLoaded", () => {
       piece.setAttribute('animation__shrink',{
         property:'scale',
         to:'0 0 0',
-        dur: 400,
+        dur: reversePopDuration,
         easing:'easeInBack',
         delay: i*150
       });
-      setTimeout(()=>piece.remove(), 400 + i*150 + 50);
+      setTimeout(()=>piece.remove(), reversePopDuration + i*150 + 50);
     });
-    const totalDelay = pieces.length*150 + 400 + 200;
+    const totalDelay = pieces.length*150 + reversePopDuration + 200;
     setTimeout(createFinalModel, totalDelay);
   }
 
@@ -176,6 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     container.appendChild(textRenovation);
 
+    // Overlay finale
     setTimeout(() => {
       const outroOverlay = document.createElement('div');
       outroOverlay.id = "outroOverlay";
@@ -188,22 +214,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 10000);
   }
 
-  // --- Gestione click globale ---
-  window.addEventListener('click', () => {
-    if(firstClick){
-      startText.setAttribute('visible','false');
-      firstClick=false;
-      addNextPiece(); // primo pezzo comparirà al primo tap
-      return;
-    }
-    addNextPiece();
-  });
-
-  // --- Inizializza sequenza solo al primo targetFound ---
+  // --- Aggiorna visibilità marker ---
   marker.addEventListener('targetFound', () => {
+    markerVisible = true;
     if(!sequenceStarted){
       sequenceStarted = true;
-      // Ora la scritta è visibile, aspettiamo il primo tap per partire
+      initModelsSequence(); // crea la scritta iniziale e attiva il click listener
     }
   });
+
+  marker.addEventListener('targetLost', () => {
+    markerVisible = false;
+  });
+
 });
