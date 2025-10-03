@@ -94,16 +94,6 @@
   </style>
 </head>
 <body>
-  <!-- Overlay iniziale count4.png -->
-  <div id="introOverlay" class="overlay">
-    <img src="images/count4.png" alt="Intro">
-  </div>
-
-  <!-- Overlay istruzioni -->
-  <div id="instructionsOverlay" class="overlay" style="display:flex; opacity:0;">
-    <img src="images/instructions.png" alt="Instructions">
-    <div id="tapText">Tap to start</div>
-  </div>
 
   <!-- Custom MindAR scanning UI -->
   <div id="custom-scanning-ui" class="visible">
@@ -150,54 +140,64 @@
 
   <script src="js/main.js"></script>
   <script>
-   document.addEventListener("DOMContentLoaded", () => {
-  const intro = document.getElementById("introOverlay");
-  const instructions = document.getElementById("instructionsOverlay");
-  const tapText = document.getElementById("tapText");
-  const sceneEl = document.querySelector("a-scene");
-  const scanningUI = document.getElementById("custom-scanning-ui");
-  const marker = document.getElementById("marker");
+    document.addEventListener("DOMContentLoaded", () => {
+      const sceneEl = document.querySelector("a-scene");
+      const intro = document.createElement("div");
+      const instructions = document.createElement("div");
+      const tapText = document.createElement("div");
+      const scanningUI = document.getElementById("custom-scanning-ui");
+      const marker = document.getElementById("marker");
 
-  // --- Overlay iniziale count4.png ---
-  setTimeout(() => intro.classList.add("show"), 100);
-  setTimeout(() => {
-    intro.classList.remove("show");
-    intro.classList.add("hide");
-    setTimeout(() => intro.remove(), 1000);
-  }, 5000);
+      // --- Overlay iniziale count4.png ---
+      intro.id = "introOverlay";
+      intro.className = "overlay";
+      const introImg = document.createElement("img");
+      introImg.src = "images/count4.png";
+      intro.appendChild(introImg);
+      document.body.appendChild(intro);
 
-  // --- Overlay istruzioni ---
-  setTimeout(() => {
-    instructions.classList.add("show");
-    tapText.classList.add("show");
+      setTimeout(() => intro.classList.add("show"), 100);
+      setTimeout(() => { intro.classList.remove("show"); intro.classList.add("hide"); setTimeout(()=>intro.remove(),1000); }, 5000);
 
-    instructions.addEventListener("click", async () => {
-      instructions.classList.remove("show");
-      instructions.classList.add("hide");
-      setTimeout(() => instructions.remove(), 1000);
+      // --- Overlay istruzioni instructions.png ---
+      instructions.id = "instructionsOverlay";
+      instructions.className = "overlay";
+      const instrImg = document.createElement("img");
+      instrImg.src = "images/instructions.png";
+      instructions.appendChild(instrImg);
 
-      // Mostra scena e avvia MindAR
-      sceneEl.style.display = "flex";
-      const mindarSystem = sceneEl.systems["mindar-image-system"];
-      await mindarSystem.start();
+      tapText.id = "tapText";
+      tapText.innerText = "Tap to start";
+      instructions.appendChild(tapText);
+      document.body.appendChild(instructions);
 
-      // Rimuove pulsante VR se presente
-      const vrButton = document.querySelector(".a-enter-vr-button");
-      if(vrButton) vrButton.remove();
-    }, { once: true });
-  }, 6000);
+      setTimeout(() => { instructions.classList.add("show"); tapText.classList.add("show"); }, 6000);
 
-  // --- Scanner UI visibile finché marker non trovato ---
-  marker.addEventListener('targetFound', () => {
-    scanningUI.classList.add("hidden");
-    scanningUI.classList.remove("visible");
-  });
+      instructions.addEventListener("click", async () => {
+        instructions.classList.remove("show");
+        instructions.classList.add("hide");
+        setTimeout(() => instructions.remove(), 1000);
 
-  marker.addEventListener('targetLost', () => {
-    scanningUI.classList.remove("hidden");
-    scanningUI.classList.add("visible");
-  });
-});
+        // Mostra scena e avvia MindAR
+        sceneEl.style.display = "flex";
+        const mindarSystem = sceneEl.systems["mindar-image-system"];
+        await mindarSystem.start();
+
+        const vrButton = document.querySelector(".a-enter-vr-button");
+        if(vrButton) vrButton.remove();
+      }, { once: true });
+
+      // --- Scanner UI visibile finché marker non trovato ---
+      marker.addEventListener('targetFound', () => {
+        scanningUI.classList.add("hidden");
+        scanningUI.classList.remove("visible");
+      });
+
+      marker.addEventListener('targetLost', () => {
+        scanningUI.classList.remove("hidden");
+        scanningUI.classList.add("visible");
+      });
+    });
   </script>
 </body>
 </html>
