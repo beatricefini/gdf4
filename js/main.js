@@ -193,6 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(firstClick){
       startText.setAttribute('visible','false');
       firstClick=false;
+      addNextPiece(); // primo pezzo comparirà al primo tap
       return;
     }
     addNextPiece();
@@ -202,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
   marker.addEventListener('targetFound', () => {
     if(!sequenceStarted){
       sequenceStarted = true;
-      addNextPiece(); // facciamo partire subito il primo pezzo
+      // Ora la scritta è visibile, aspettiamo il primo tap per partire
     }
   });
 });
